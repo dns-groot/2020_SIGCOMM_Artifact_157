@@ -64,7 +64,7 @@ def ScatterPlot():
     plot.set_xscale('log')
     plot.tick_params(labelsize=75)
     plt.subplots_adjust(hspace=1.6)
-    plt.savefig('Figure7.pdf', bbox_inches='tight', dpi=300)
+    plt.savefig(pathlib.Path.cwd().parent / 'shared' / 'Figure7.pdf', bbox_inches='tight', dpi=300)
     # plt.show()
 
 

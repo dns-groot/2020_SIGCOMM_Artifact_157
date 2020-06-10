@@ -53,7 +53,7 @@ def Generate_CSV(logs_directory):
     attributes.sort(key=lambda x: x[2], reverse=True)
     attributes.insert(0, ["Domain", "Total RRs", "Total Interpretation Graphs", "Graph building (s)", "Property Checking (s)",
                           "Total time (s)", "Label Graph ", "Interpretation Graph Vertices", "Interpretation Graph Edges"])
-    with open("Attributes.csv", "w", newline='') as filex:
+    with open(pathlib.Path.cwd().parent / "shared" / "Attributes.csv", "w", newline='') as filex:
         writer = csv.writer(filex)
         for a in attributes:
             writer.writerow(a)
@@ -96,12 +96,13 @@ def Generate_Plot(attributes):
     plot.set_xscale('log', basex=10)
     plot.tick_params(labelsize=30)
     plot.legend(fontsize=30)
-    plt.savefig('Figure8.pdf', bbox_inches='tight')
+    plt.savefig(pathlib.Path.cwd().parent / "shared" / "Figure8.pdf", bbox_inches='tight')
 
 
 if __name__ == "__main__":
     # Assumes that the census_larger folder is present in the shared folder.
-    census_dataset = pathlib.Path.cwd().parent / "shared" / "census_larger"
+    parent = pathlib.Path.cwd().parent
+    census_dataset = parent / "shared" / "census_larger"
     if not census_dataset.exists():
         print("census_larger folder doesn't exist")
         exit()
@@ -111,8 +112,8 @@ if __name__ == "__main__":
     groot = pathlib.Path(sys.argv[1])
     if groot.exists() and os.access(groot, os.X_OK):
         Run_GRoot(census_dataset, sys.argv[1],
-                  pathlib.Path("logs"))
-        attributes = Generate_CSV(pathlib.Path("logs"))
+                  pathlib.Path(parent / "shared" / "logs"))
+        attributes = Generate_CSV(pathlib.Path(parent / "shared" / "logs"))
         Generate_Plot(attributes)
     else:
         print("Please check the path provided for GRoot executable.")

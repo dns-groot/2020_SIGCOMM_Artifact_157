@@ -32,7 +32,7 @@ _**Note:** The docker image may consume  ~&hairsp;1.2&hairsp;GB of disk space._
 Therefore, to run Groot on zones files residing on the host system,
 you must first [bind mount] them while running the container:
     ```bash
-    docker run -v <path to the above data folder>:/home/groot/groot/shared -it dnsgt/groot
+    docker run -v <absolute path to the above data folder>:/home/groot/groot/shared -it dnsgt/2020_sigcomm_artifact_157
     ```
     This would give you a `bash` shell within groot directory.
  
@@ -55,9 +55,9 @@ The `data` folder on the host system would then be accessible within the contain
 2. Install the C++ libraries (64 bit versions) using:
     - .\vcpkg.exe install boost-serialization:x64-windows boost-flyweight:x64-windows boost-dynamic-bitset:x64-windows boost-graph:x64-windows  boost-accumulators:x64-windows docopt:x64-windows nlohmann-json:x64-windows spdlog:x64-windows
     - .\vcpkg.exe integrate install 
-3. Clone the repository (with  `--recurse-submodules`) and open the solution (groot.sln) using Visual studio. Set the platform to x64 and mode to Release.
+3. Clone the repository (with  `--recurse-submodules`) and open the solution (groot.sln) using Visual Studio. Set the platform to x64 and mode to Release.
 4. Configure the project properties to use ISO C++17 Standard (std:c++17) for C++ language standard.
-5. Build the project using visual studio to generate the executable. The executable would be located at `~\groot\x64\Release\`.
+5. Set `groot` as `Set as Startup Project` using the solution explorer in the Visual Studio. Build the project using visual studio to generate the executable. The executable would be located at `~\groot\x64\Release\`.
 6. Install python3 and `matplotlib` library.
 7. Move the `data` folder to the top of this repository and rename the folder to `shared`.
 </details>
@@ -69,11 +69,11 @@ All commands must be run within `~/groot/scripts/` directory.
 
 ### Figure 7(b)
 
-- To generate the plot shown in _Figure 7(b)_ run the script `Figure5.py`.
+- To generate the plot shown in _Figure 7(b)_ run the script `Figure7.py`.
      ```bash
      python3 Figure7.py
      ```
-- _Est. Time:_ 5 min, generates the plot `Figure7.pdf` directly
+- _Est. Time:_ 5 min, generates the plot `Figure7.pdf` directly in the `shared` folder.
 
 ### Figure 8
 
@@ -82,7 +82,7 @@ All commands must be run within `~/groot/scripts/` directory.
      - One can run the same following steps on the `census_smaller` by slightly modifying the `Figure8.py` if required.  
 - To generate the plot shown in _Figure 8_ run the script `Figure8.py`.
      ```bash
-     python Figure8.py <path_to_the_groot_executable>
+     python3 Figure8.py <path_to_the_groot_executable>
      ```
      - The script requires as input the path to the groot executable.
      - If the script is run from a docker container, then the script can be run as follows:
@@ -93,7 +93,7 @@ All commands must be run within `~/groot/scripts/` directory.
           ```bash
           python3 Figure8.py ..\x64\Release\groot.exe
           ```
-     - The script dumps the log for each domain into the `logs/` subdirectory and in the end generates a summary file `Attributes.csv`.
+     - The script dumps the log for each domain into the `shared/logs/` subdirectory and in the end generates a summary file `Attributes.csv` in the `shared` folder.
      - `Attributes.csv` contains the following information for each domain:
         - Number of resource records
         - _Number of interpretation graphs built_
@@ -103,7 +103,7 @@ All commands must be run within `~/groot/scripts/` directory.
         - Label graph size (number of vertices and edges)
         - Statistics across interpretation graphs (mean, median, min and max of vertices and edges)  
      - **NOTE:** After running the tool on all the 270 domains of the `census_larger` dataset, the script groups the domains into buckets of size 1000 based on the number of interpretation graphs and considers the mean value from each bucket to make the visualization more comfortable to understand.
-- _Est. Time:_ 4 hours, generates the plot `Figure8.pdf` from `Attributes.csv`
+- _Est. Time:_ 4 hours, generates the plot `Figure8.pdf` from `Attributes.csv` in the `shared` folder.
 
 ## LICENSE
 
