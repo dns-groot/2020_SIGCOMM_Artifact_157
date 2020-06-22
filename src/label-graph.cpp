@@ -283,15 +283,20 @@ void label::Graph::CompareParentChildDelegationRecords(
                 context.zoneId_nameserver_map.at(std::get<0>(*itp)), "child-a", "child-b");
         }
     }
-    if (j.size() || (parent.empty() && !child.empty())) {
+    // if (parent.empty() && !child.empty()) {
+    //    if (j.find("Inconsistent Pairs") == j.end()) {
+    //        j["Inconsistent Pairs"] = {};
+    //    }
+    //    json tmp;
+    //    tmp["Warning"] = "There are no NS records at the parent or parent zone file is missing";
+    //    tmp["Child NS"] = {};
+    //    for (auto c : child)
+    //        tmp["Child NS"].push_back(context.zoneId_nameserver_map.at(std::get<0>(c)));
+    //    j["Inconsistent Pairs"].push_back(tmp);
+    //}
+    if (j.size()) {
         j["Property"] = "Structural Delegation Consistency";
         j["Domain Name"] = user_input;
-        if (parent.empty() && !child.empty()) {
-            j["Warning"] = "There are no NS records at the parent or parent zone file is missing";
-            j["Child NS"] = {};
-            for (auto c : child)
-                j["Child NS"].push_back(context.zoneId_nameserver_map.at(std::get<0>(c)));
-        }
         current_job.json_queue.enqueue(j);
     }
 }
@@ -451,7 +456,9 @@ void label::Graph::SubDomainECGeneration(
     for (NodeLabel &l : parent_domain_name) {
         len += l.get().length() + 1;
     }
-    if (len == kMaxDomainLength) {
+    if (len == kMaxDomainLength || len == (*this)[start].len) {
+        //return if length exceedes or DNAME loop detected 
+        //mostly likely turns out as cyclic zone dependecy so no need to report here
         return;
     }
     NodeLabel node_labels = (*this)[start].name;
@@ -542,20 +549,10 @@ void label::Graph::GenerateECs(Job &current_job, const Context &context)
 {
     // Given an user input for domain and query types, the function searches for relevant node
     // The search is relevant even for subdomain = False as we want to know the exact EC
-    if (current_job.user_input_domain.length() > kMaxDomainLength) {
-        Logger->warn(fmt::format(
-            "label-graph.cpp (GenerateECs) - Userinput, {}, exceedes the valid domain length",
-            current_job.user_input_domain));
-        return;
-    }
+
     vector<NodeLabel> labels = LabelUtils::StringToLabels(current_job.user_input_domain);
-    for (NodeLabel &l : labels) {
-        if (l.get().length() > kMaxLabelLength) {
-            Logger->warn(fmt::format(
-                "label-graph.cpp (GenerateECs) - Userinput, {}, has a label, {}, exceedeing the valid label length",
-                current_job.user_input_domain, l.get()));
-            return;
-        }
+    if (!std::get<0>(LabelUtils::LengthCheck(labels, 2))) {
+        return;
     }
     vector<ClosestNode> closest_enclosers = ClosestEnclosers(labels);
     if (closest_enclosers.size()) {

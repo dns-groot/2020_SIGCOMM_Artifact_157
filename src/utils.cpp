@@ -24,6 +24,31 @@ string LabelUtils::LabelsToString(vector<vector<NodeLabel>> domains)
     return result + "]";
 }
 
+tuple<bool, string> LabelUtils::LengthCheck(vector<NodeLabel> domain_labels, int level)
+{
+    int length = 0;
+    for (NodeLabel &l : domain_labels) {
+        if (l.get().length() > kMaxLabelLength) {
+            if (level == 2) {
+                Logger->warn(fmt::format(
+                    "label-graph.cpp (GenerateECs) - Userinput, {}, has a label, {}, exceedeing the valid label length",
+                    LabelUtils::LabelsToString(domain_labels), l.get()));
+            }
+            return {false, l.get()};
+        }
+        length += l.get().length() + 1;
+    }
+    if (length > kMaxDomainLength) {
+        if (level == 2) {
+            Logger->warn(fmt::format(
+                "label-graph.cpp (GenerateECs) - Userinput, {}, exceedes the valid domain length",
+                LabelUtils::LabelsToString(domain_labels)));
+        }
+        return {false, ""};
+    }
+    return {true, ""};
+}
+
 vector<NodeLabel> LabelUtils::StringToLabels(string domain_name)
 {
     vector<NodeLabel> tokens;
@@ -158,4 +183,50 @@ CommonSymDiff RRUtils::CompareRRs(vector<ResourceRecord> res_a, vector<ResourceR
             it++;
     }
     return std::make_tuple(common, res_a, res_b);
+}
+
+void LintUtils::WriteIssueToFile(json &log_line, bool lint)
+{
+    int i = 0;
+    if (lint) {
+        std::fstream in("lint.json", ios::in);
+        if (in.is_open()) {
+            string tp;
+
+            while (getline(in, tp)) {
+                i++;
+                if (i > 3)
+                    break;
+            }
+            in.close();
+        } else {
+            Logger->error("Linting enabled but unable to open the lint.txt file for reading");
+        }
+        std::ofstream out("lint.json", ios::app);
+        if (i > 3)
+            out << ",\n";
+        out << log_line.dump(4);
+        out.close();
+    }
+}
+
+void LintUtils::WriteRRIssueToFile(
+    bool lint,
+    string file_name,
+    size_t line,
+    string current_rr,
+    string violation,
+    string previous_rr)
+{
+    if (lint) {
+        json tmp;
+        tmp["File Name"] = file_name;
+        tmp["Line Number"] = line;
+        tmp["Current Record"] = current_rr;
+        tmp["Violation"] = violation;
+        if (previous_rr.length()) {
+            tmp["Previous Record"] = previous_rr;
+        }
+        WriteIssueToFile(tmp, lint);
+    }
 }
