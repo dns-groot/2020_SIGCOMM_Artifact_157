@@ -22,4 +22,6 @@ COPY Dockerfile Dockerfile
 
 COPY scripts/ scripts
 
+RUN sudo chown -R groot:groot README.md  sigcomm_artifact.sln Dockerfile scripts
+
 CMD [ "bash" ]
