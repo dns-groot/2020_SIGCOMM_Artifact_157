@@ -10,17 +10,21 @@ import sys
 from statistics import mean
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 def Run_GRoot(census_directory, groot_executable, logs_folder):
     i = 0
     logs_folder.mkdir(exist_ok=True)
-
+    k = 0
     for domain in census_directory.iterdir():
         i += 1
         subprocess.run([groot_executable, domain, "-l"])
         pathlib.Path("log.txt").rename(domain.name + '.txt')
         shutil.move(domain.name + '.txt', logs_folder)
+        if i >= 100000*k:
+            print(f'> Finished {i} domains')
+            k += 1
 
 
 def Generate_CSV(logs_directory):
@@ -50,61 +54,58 @@ def Generate_CSV(logs_directory):
                     edges = line.split("Interpretation Graph Edges: ")[-1][:-1]
             attributes.append([f.with_suffix('').name, int(total_rrs), int(ecs),
                                float(graph), float(checking), float(graph) + float(checking), label, vertices, edges])
-    attributes.sort(key=lambda x: x[2], reverse=True)
+    attributes.sort(key=lambda x: x[1], reverse=True)
     attributes.insert(0, ["Domain", "Total RRs", "Total Interpretation Graphs", "Graph building (s)", "Property Checking (s)",
                           "Total time (s)", "Label Graph ", "Interpretation Graph Vertices", "Interpretation Graph Edges"])
     with open(pathlib.Path.cwd().parent / "shared" / "Attributes.csv", "w", newline='') as filex:
         writer = csv.writer(filex)
         for a in attributes:
             writer.writerow(a)
+    print(f'> Finished generation of Attributes.csv')
     return attributes
 
 
 def Generate_Plot(attributes):
 
-    bucket = {}
+    rrs_time = {}
     for row in attributes[1:]:
-        bucket.setdefault(int(row[2]/1000), list()).append(row)
+        rrs_time.setdefault(int(row[1]), list()).append(float(row[5]))
 
-    total_graphs = []
-    graph_building = []
-    property_checking = []
-    total_time = []
-    for (_, elems) in bucket.items():
-        _, _, total_graphs_b, graph_building_b, property_checking_b, total_time_b, _, _, _ = zip(
-            *elems)
-        total_graphs.append(mean(total_graphs_b))
-        graph_building.append(mean(graph_building_b))
-        property_checking.append(mean(property_checking_b))
-        total_time.append(mean(total_time_b))
+    rrs = []
+    median_time = []
 
-    total_graphs, graph_building, property_checking, total_time = zip(
-        *sorted(zip(total_graphs, graph_building, property_checking, total_time), key=lambda t: t[0]))
+    for (x, times) in sorted(rrs_time.items()):
+        rrs.append(x)
+        median_time.append(np.median(times))
 
-    p = plt.figure(1, figsize=(12, 7))
+    p = plt.figure(1, figsize=(18, 8))
     plot = p.add_subplot(1, 1, 1)
 
-    plot.scatter(total_graphs, total_time, s=90, alpha=0.9,
-                 label="Total time", marker="x", c='purple')
-
-    plot.plot(total_graphs, graph_building, label="Label graph building")
-    plot.plot(total_graphs, property_checking, label="Property checking")
-
-    plot.set_xlabel('Number of interpretation graphs built', fontsize=30)
-    plot.set_ylabel('Time (s)', fontsize=30)
+    plot.yaxis.grid(ls='dotted', alpha=0.6, zorder=0)
+    plot.xaxis.grid(ls='dotted', alpha=0.6, zorder=0)
+    plot.set_xlabel('Number of resource records', fontsize=40)
+    plot.set_ylabel('Time (s)', fontsize=40)
     plot.set_yscale('log')
-    plot.set_xscale('log', basex=10)
-    plot.tick_params(labelsize=30)
-    plot.legend(fontsize=30)
-    plt.savefig(pathlib.Path.cwd().parent / "shared" / "Figure8.pdf", bbox_inches='tight')
+    plot.set_xscale('log')
+    plot.scatter(rrs, median_time, s=95, alpha=0.6,
+                 marker=".", c='purple', zorder=3)
+    plot.set_yticks([0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000])
+    plot.tick_params(labelsize=35)
+    plot.set_xlim(xmin=1, xmax=31000000)
+
+    plt.savefig(pathlib.Path.cwd().parent / "shared" /
+                "Figure8.pdf", bbox_inches='tight')
+    print(f'> Plot saved to: shared/Figure8.pdf')
+    # plt.show()
 
 
 if __name__ == "__main__":
-    # Assumes that the census_larger folder is present in the shared folder.
+    # Assumes that the census folder is present in the shared folder.
+
     parent = pathlib.Path.cwd().parent
-    census_dataset = parent / "shared" / "census_larger"
+    census_dataset = parent / "shared" / "census"
     if not census_dataset.exists():
-        print("census_larger folder doesn't exist")
+        print("census folder doesn't exist")
         exit()
     if len(sys.argv) < 2:
         print("Path to the GRoot exectuable is not provided")

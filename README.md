@@ -14,11 +14,10 @@ This repository contains the code to reproduce the claims made in our SIGCOMM pa
   _Reason_: The zone files used for these experiments are confidental and proprietary.
 
 ## Census Dataset Organization
-The Census data is divided into two parts and are available at:
-- [Census_larger](https://ucla.box.com/s/4uf4w6lkwp3ul3788f3kpkyg5j43ap87)
-- [Census_smaller](https://ucla.box.com/s/l4e7jvwixunjettonhwbj8lw625gtlb0)
+The Census data is available at:  [Census](https://ucla.box.com/s/tod4z48cb66hjgto2dg7fel7gj21bt4s)
 
-Download and unzip the two datasets. Let the two folders be placed in a folder named `data`.  
+
+Download and unzip the dataset. Let the `census` folder be placed in a folder named `data`.  
 
 ## Installation
 
@@ -77,9 +76,6 @@ All commands must be run within `~/groot/scripts/` directory.
 
 ### Figure 8
 
-- This plot is based on only the `census_larger` dataset
-     - We used a threshold of at least 5000 interpretation graphs and all the domains in `census_smaller` generate less than 5000 interpretation graphs.
-     - One can run the same following steps on the `census_smaller` by slightly modifying the `Figure8.py` if required.  
 - To generate the plot shown in _Figure 8_ run the script `Figure8.py`.
      ```bash
      python3 Figure8.py <path_to_the_groot_executable>
@@ -95,15 +91,15 @@ All commands must be run within `~/groot/scripts/` directory.
           ```
      - The script dumps the log for each domain into the `shared/logs/` subdirectory and in the end generates a summary file `Attributes.csv` in the `shared` folder.
      - `Attributes.csv` contains the following information for each domain:
-        - Number of resource records
-        - _Number of interpretation graphs built_
-        - Time taken to parse zone files and build the label graph (_Label graph building_)
-        - Time taken to construct the interpretation graphs and check properties on them (_Property checking_)
+        - _Number of resource records_
+        - Number of interpretation graphs built
+        - Time taken to parse zone files and build the label graph (Label graph building)
+        - Time taken to construct the interpretation graphs and check properties on them (Property checking)
         - _Total execution time_
         - Label graph size (number of vertices and edges)
         - Statistics across interpretation graphs (mean, median, min and max of vertices and edges)  
-     - **NOTE:** After running the tool on all the 270 domains of the `census_larger` dataset, the script groups the domains into buckets of size 1000 based on the number of interpretation graphs and considers the mean value from each bucket to make the visualization more comfortable to understand.
-- _Est. Time:_ 4 hours, generates the plot `Figure8.pdf` from `Attributes.csv` in the `shared` folder.
+     - **NOTE:** After running the tool on all the domains, the script calculates the median time for each value of the number of resource records and plots the median time vs the number of resource records. 
+- _Est. Time:_ 10 hours, generates the plot `Figure8.pdf` from `Attributes.csv` in the `shared` folder.
 
 ## LICENSE
 

@@ -30,20 +30,19 @@ class ThreadFun(Thread):
 
 
 def RRCountSubZonesCalculator():
-    data = pathlib.Path.cwd().parent / "shared"
-    for dataset in [data / "census_larger", data / "census_smaller"]:
-        domains = list(dataset.iterdir())
-        chunk = int(len(domains)/THREADS) + 1
-        i, tid = 0, 0
-        threadPool = []
-        while tid < THREADS:
-            threadPool.append(ThreadFun(domains[i:i+chunk], tid, dataset))
-            i = i + chunk
-            tid += 1
-        for t in threadPool:
-            t.start()
-        for t in threadPool:
-            t.join()
+    data = pathlib.Path.cwd().parent / "shared" / "census"
+    domains = list(data.iterdir())
+    chunk = int(len(domains)/THREADS) + 1
+    i, tid = 0, 0
+    threadPool = []
+    while tid < THREADS:
+        threadPool.append(ThreadFun(domains[i:i+chunk], tid, data))
+        i = i + chunk
+        tid += 1
+    for t in threadPool:
+        t.start()
+    for t in threadPool:
+        t.join()
 
 
 def ScatterPlot():
@@ -64,20 +63,17 @@ def ScatterPlot():
     plot.set_xscale('log')
     plot.tick_params(labelsize=75)
     plt.subplots_adjust(hspace=1.6)
-    plt.savefig(pathlib.Path.cwd().parent / 'shared' / 'Figure7.pdf', bbox_inches='tight', dpi=300)
+    plt.savefig(pathlib.Path.cwd().parent / 'shared' /
+                'Figure7.pdf', bbox_inches='tight', dpi=300)
+    print(f'> Plot saved to: shared/Figure7.pdf')
     # plt.show()
 
 
 if __name__ == "__main__":
-    # Assumes that the census_larger and census_smaller folders are present in the shared folder.
+    # Assumes that the census folder is present in the shared folder.
     data = pathlib.Path.cwd().parent / "shared"
-    if not (data / "census_larger").exists():
-        print("census_larger folder doesn't exist")
+    if not (data / "census").exists():
+        print("census folder doesn't exist")
         exit()
-    if not (data / "census_smaller").exists():
-        print("census_smaller folder doesn't exist")
-        exit()
-
     RRCountSubZonesCalculator()
     ScatterPlot()
-
