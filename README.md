@@ -5,19 +5,23 @@ This repository contains the code to reproduce the claims made in our SIGCOMM pa
 **NOTE:** Please refer to the maintained [`GRoot`](https://github.com/dns-groot/groot) repository to learn how to use the tool to check various properties and also to make pull requests or to create issues. This repository is only for archival purposes. 
 
 ### Claims Supported by The Artifact
-- Full dataset created from the DNS Census data
+- Full dataset (zone files) created from the CSV files of the publicly available [DNS Census 2013](https://dnscensus2013.neocities.org/index.html)
 - Census Dataset statistics as shown in _Figure 7(b)_
-- Performance claims made in _&sect;7.3_ for DNS Census and the corresponding plot shown in _Figure 8_  
+- Performance claims made in _&sect;7.3_ on DNS Census dataset and the corresponding plot shown in _Figure 8_  
     
 ### Claims NOT Supported by The Artifact
 - Functionality claims made in _&sect;7.2_ (related to _Figure 7(a)_ and _Table 4_)  
   _Reason_: The zone files used for these experiments are confidental and proprietary.
 
 ## Census Dataset Organization
-The Census data is available at:  [Census](https://ucla.box.com/s/tod4z48cb66hjgto2dg7fel7gj21bt4s)
-
+The created Census data is available from UCLA box:  [Census Dataset](https://ucla.box.com/s/tod4z48cb66hjgto2dg7fel7gj21bt4s)
 
 Download and unzip the dataset. Let the `census` folder be placed in a folder named `data`.  
+The compressed dataset is _~3&hairsp;GB_ and consists of _~8.1&hairsp;M_ files. 
+
+:rotating_light: **Linux:** When decompressed the folder consumes  _~38&hairsp;GB_ on Linux due to the default _4&hairsp;KB_ block size on ext4. One of the plot generation scripts also generates _~1.3&hairsp;M_ files. The Linux system might give the error message `No space left on device` when decompressing even if there is plenty of disk place. [This happens when the filesystem runs out of inodes.](https://scoutapm.com/blog/understanding-disk-inodes) The Census dataset requires at least  _~45&hairsp;GB_ of unused disk space and also _~10.7&hairsp;M_ free inodes (can be checked using `df -ih`).
+
+:warning: **Windows:** When decompressed the folder consumes only _~4&hairsp;GB_ on Windows [since majority of the files are less than _1&hairsp;KB_.](https://superuser.com/questions/1030800/how-can-a-files-size-on-disk-be-0-bytes-when-theres-data-in-it)
 
 ## Installation
 
@@ -39,7 +43,7 @@ you must first [bind mount] them while running the container:
 <a name="note_1"><sup>#</sup></a> Alternatively, you could also build the Docker image locally:
 
 ```bash
-docker build -t dnsgt/groot github.com/dns-groot/groot
+docker build -t dnsgt/2020_sigcomm_artifact_157 github.com/dns-groot/2020_sigcomm_artifact_157
 ```
 
 The `data` folder on the host system would then be accessible within the container at `~/groot/shared` (with read+write permissions). 
@@ -91,14 +95,14 @@ All commands must be run within `~/groot/scripts/` directory.
           ```
      - The script dumps the log for each domain into the `shared/logs/` subdirectory and in the end generates a summary file `Attributes.csv` in the `shared` folder.
      - `Attributes.csv` contains the following information for each domain:
-        - _Number of resource records_
+        - _Number of resource records_ (_RRs_)
         - Number of interpretation graphs built
         - Time taken to parse zone files and build the label graph (Label graph building)
         - Time taken to construct the interpretation graphs and check properties on them (Property checking)
-        - _Total execution time_
+        - _Total execution time_ (_T_)
         - Label graph size (number of vertices and edges)
         - Statistics across interpretation graphs (mean, median, min and max of vertices and edges)  
-     - **NOTE:** After running the tool on all the domains, the script calculates the median time for each value of the number of resource records and plots the median time vs the number of resource records. 
+     - **NOTE:** After running GRoot on all the _~1.3&hairsp;M_ domains, the script calculates the median _T_ for each distinct value of _RRs_ and plots the median _T_ vs the _RRs_. 
 - _Est. Time:_ 10 hours, generates the plot `Figure8.pdf` from `Attributes.csv` in the `shared` folder.
 
 ## LICENSE
