@@ -13,7 +13,7 @@ This repository contains the code to reproduce the claims made in our SIGCOMM pa
     
 ### Claims NOT Supported by The Artifact
 - Functionality claims made in _&sect;7.2_ (related to _Figure 7(a)_ and _Table 4_)  
-  _Reason_: The zone files used for these experiments are confidental and proprietary.
+  _Reason_: The zone files used for these experiments are confidential  and proprietary.
 
 ## Census Dataset Organization
 The created Census data is available from UCLA box:  [Census Dataset](https://ucla.box.com/s/tod4z48cb66hjgto2dg7fel7gj21bt4s)
@@ -21,9 +21,9 @@ The created Census data is available from UCLA box:  [Census Dataset](https://uc
 Download and unzip the dataset. Let the `census` folder be placed in a folder named `data`.  
 The compressed dataset is _~3&hairsp;GB_ and consists of _~8.1&hairsp;M_ files. 
 
-:rotating_light: **Linux:** When decompressed the folder consumes  _~38&hairsp;GB_ on Linux due to the default _4&hairsp;KB_ block size on ext4. One of the plot generation scripts also generates _~1.3&hairsp;M_ files. The Linux system might give the error message `No space left on device` when decompressing even if there is plenty of disk place. [This happens when the filesystem runs out of inodes.](https://scoutapm.com/blog/understanding-disk-inodes) The Census dataset requires at least  _~45&hairsp;GB_ of unused disk space and also _~10.7&hairsp;M_ free inodes (can be checked using `df -ih`).
+:rotating_light: **Linux:** When decompressed the folder consumes  _~38&hairsp;GB_ on Linux due to the default _4&hairsp;KB_ block size on ext4. One of the plot generation scripts also generates _~1.3&hairsp;M_ files. The Linux system might give the error message `No space left on device` when decompressing even if there is plenty of disk place. [This happens when the filesystem runs out of inodes.](https://scoutapm.com/blog/understanding-disk-inodes) The Census dataset and the plot generation scripts together require at least  _~45&hairsp;GB_ of unused disk space and also _~10.7&hairsp;M_ free inodes (can be checked using `df -ih`).
 
-:warning: **Windows:** When decompressed the folder consumes only _~4&hairsp;GB_ on Windows [since majority of the files are less than _1&hairsp;KB_.](https://superuser.com/questions/1030800/how-can-a-files-size-on-disk-be-0-bytes-when-theres-data-in-it)
+:warning: **Windows:** When decompressed the folder consumes only _~4&hairsp;GB_ on Windows [since the majority of the files are less than _1&hairsp;KB_.](https://superuser.com/questions/1030800/how-can-a-files-size-on-disk-be-0-bytes-when-theres-data-in-it)
 
 ## Installation
 
