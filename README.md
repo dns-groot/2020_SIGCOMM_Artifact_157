@@ -1,4 +1,6 @@
-# SIGCOMM'20 Artifact for Paper 157
+SIGCOMM'20 Artifact for Paper 157
+<a href='https://zenodo.org/record/3905968'><img align='right' src='https://img.shields.io/badge/DOI-10.5281%2Fzenodo.3905968-blue.svg'/></a>
+=============================
 
 This repository contains the code to reproduce the claims made in our SIGCOMM paper titled "GRoot: Proactive Verification of DNS Configurations". More specifically, we provide the working code for generating the equivalence classes, constructing the interpretation graphs, and for checking various properties over the constructed interpretation graphs.
 
